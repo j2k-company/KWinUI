@@ -79,22 +79,3 @@ inline fun Component.button(
         BasicComponents.BUTTON.name, text, x, y, width, height, dwStyle, this.hwnd
     ).apply { init() }
 )
-
-inline fun createWindow(
-    title: String? = null,
-    x: Int = CW_USEDEFAULT,
-    y: Int = CW_USEDEFAULT,
-    width: Int = CW_USEDEFAULT,
-    height: Int = CW_USEDEFAULT,
-    dwStyle: Int = 0,
-    init: Component.() -> Unit
-) = Component(
-    getClassName(),
-    title,
-    x, y, width, height,
-    dwStyle,
-    null,
-    null,
-    GetModuleHandleA(null),
-    null
-).apply { init() }

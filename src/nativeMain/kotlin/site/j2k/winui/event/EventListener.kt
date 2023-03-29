@@ -1,6 +1,4 @@
-sealed class Event
-
-interface EventType<T : Event>
+package site.j2k.winui.event
 
 fun interface EventHandler<T: Event> {
     operator fun invoke(event: T)
