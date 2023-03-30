@@ -58,8 +58,9 @@ inline fun winUI(
     dwStyle: Int = 0,
     init: Component.() -> Unit
 ) {
+    val className = registerClass(getClassName())
     Component(
-        getClassName(),
+        className,
         title,
         x, y, width, height,
         dwStyle,
