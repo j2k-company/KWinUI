@@ -1,8 +1,19 @@
+package site.j2k.winui
+
 import kotlinx.cinterop.*
 import platform.windows.*
-import site.j2k.winui.Component
 import site.j2k.winui.event.*
-import site.j2k.winui.getClassName
+
+
+fun messageLoop() {
+    memScoped {
+        val msg = alloc<MSG>()
+        while (GetMessageA(msg.ptr, null, 0u, 0u) > 0) {
+            TranslateMessage(msg.ptr)
+            DispatchMessageA(msg.ptr)
+        }
+    }
+}
 
 private fun wndProc(
     hwnd: HWND?,
@@ -56,6 +67,7 @@ inline fun winUI(
     width: Int = CW_USEDEFAULT,
     height: Int = CW_USEDEFAULT,
     dwStyle: Int = 0,
+    useMessageLoop: Boolean = true,
     init: Component.() -> Unit
 ) {
     val className = registerClass(getClassName())
@@ -69,6 +81,8 @@ inline fun winUI(
         GetModuleHandleA(null),
         null
     ).apply { init() }
+
+    if (useMessageLoop) messageLoop()
 }
 
 fun registerClass(className: String = getClassName()) = memScoped {
