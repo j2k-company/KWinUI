@@ -5,6 +5,7 @@ import kotlinx.cinterop.toCPointer
 import platform.posix.rand
 import platform.windows.*
 import site.j2k.winui.utils.BasicComponents
+import site.j2k.winui.utils.createWindow
 
 const val CLASS_NAME = "MyUniqueWindowClass"
 var counter = rand() % 123456
@@ -24,10 +25,9 @@ open class Component(
     hInstance: HINSTANCE? = null,
     lpParam: LPVOID? = null
 ) {
-    val hwnd: HWND = CreateWindowExW(
-        0u,
+    val hwnd: HWND = createWindow(
         className, windowName,
-        dwStyle.toUInt(),
+        dwStyle,
         x, y, width, height,
         parent,
         hMenu,
