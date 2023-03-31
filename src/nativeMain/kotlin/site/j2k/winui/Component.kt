@@ -27,8 +27,8 @@ open class Component(
 ) {
     val hwnd: HWND = createWindow(
         className, windowName,
-        dwStyle,
         x, y, width, height,
+        dwStyle,
         parent,
         hMenu,
         hInstance,
@@ -45,18 +45,17 @@ open class Component(
 }
 
 class Button(
-    className: String? = null,
     text: String? = null,
     x: Int = CW_USEDEFAULT,
     y: Int = CW_USEDEFAULT,
     width: Int = CW_USEDEFAULT,
     height: Int = CW_USEDEFAULT,
-    dwStyle: Int = 0,
+    dwStyle: Int = (WS_TABSTOP or WS_VISIBLE or WS_CHILD or BS_DEFPUSHBUTTON),
     parent: HWND? = null,
     hMenu: HMENU? = null,
     lpParam: LPVOID? = null
 ) : Component(
-    className, text,
+    BasicComponents.BUTTON.toString(), text,
     x, y, width, height,
     dwStyle, parent,
     hMenu,
@@ -73,9 +72,7 @@ inline fun Component.button(
     width: Int = CW_USEDEFAULT,
     height: Int = CW_USEDEFAULT,
     dwStyle: Int = 0,
-    init: Button.() -> Unit
+    init: Button.() -> Unit = {}
 ) = this.addChild(
-    Button(
-        BasicComponents.BUTTON.name, text, x, y, width, height, dwStyle, this.hwnd
-    ).apply { init() }
+    Button(text, x, y, width, height, dwStyle, this.hwnd).apply { init() }
 )

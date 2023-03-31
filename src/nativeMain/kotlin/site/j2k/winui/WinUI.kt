@@ -24,11 +24,12 @@ private fun wndProc(
     when (msg.toInt()) {
         WM_CREATE -> {
             val createStruct = lParam.toCPointer<CREATESTRUCT>()!!.pointed
-            WinUI.create(CreationEvent(createStruct))
+            mainWindow?.create(CreationEvent(createStruct))
         }
 
         WM_DESTROY -> {
-            WinUI.destroy(DestroyEvent())
+            mainWindow?.destroy(DestroyEvent())
+            PostQuitMessage(0)
         }
 
         WM_PAINT -> {
@@ -40,8 +41,33 @@ private fun wndProc(
     0L
 }
 
-private object WinUI : Component() {
-    val eventListener = EventListener()
+private var mainWindow: WinUI? = null
+
+/**
+ * Main window class
+ *
+ * NOTE: you should not use this class yourself. Use the [winUI] method
+ *
+ * @see [winUI]
+ */
+class WinUI(
+    title: String? = null,
+    x: Int = CW_USEDEFAULT,
+    y: Int = CW_USEDEFAULT,
+    width: Int = CW_USEDEFAULT,
+    height: Int = CW_USEDEFAULT,
+    dwStyle: Int = 0,
+) : Component(
+    registerClass(getClassName()),
+    title,
+    x, y, width, height,
+    dwStyle,
+    null,
+    null,
+    GetModuleHandleA(null),
+    null
+) {
+    private val eventListener = EventListener()
 
     fun onCreate(handler: EventHandler<CreationEvent>) {
         eventListener.onEvent(CreationEvent, handler)
@@ -51,11 +77,11 @@ private object WinUI : Component() {
         eventListener.onEvent(DestroyEvent, handler)
     }
 
-    fun create(event: CreationEvent) {
+    internal fun create(event: CreationEvent) {
         eventListener.dispatch(CreationEvent, event)
     }
 
-    fun destroy(event: DestroyEvent) {
+    internal fun destroy(event: DestroyEvent) {
         eventListener.dispatch(DestroyEvent, event)
     }
 }
@@ -66,21 +92,20 @@ inline fun winUI(
     y: Int = CW_USEDEFAULT,
     width: Int = CW_USEDEFAULT,
     height: Int = CW_USEDEFAULT,
-    dwStyle: Int = 0,
+    dwStyle: Int = (WS_OVERLAPPED or WS_CAPTION or WS_SYSMENU or WS_MINIMIZEBOX),
     useMessageLoop: Boolean = true,
-    init: Component.() -> Unit
+    init: Component.() -> Unit = {}
 ) {
-    val className = registerClass(getClassName())
-    Component(
-        className,
+    WinUI(
         title,
-        x, y, width, height,
-        dwStyle,
-        null,
-        null,
-        GetModuleHandleA(null),
-        null
-    ).apply { init() }
+        x, y,
+        width, height,
+        dwStyle
+    ).apply {
+        init()
+        ShowWindow(hwnd, SW_SHOWDEFAULT)
+        UpdateWindow(hwnd)
+    }
 
     if (useMessageLoop) messageLoop()
 }
